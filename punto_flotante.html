@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Convertidor a IEEE 754</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+    </style>
+</head>
+<body>
+    <h1>Convertidor de Números Reales a IEEE 754</h1>
+    <label for="num10">Introduce un número real:</label>
+    <input type="number" id="num10" step="any">
+    <button onclick="convertir()">Convertir</button>
+    
+    <div id="resultado"></div>
+    
+    <script>
+        function convertir() {
+            var numero = document.getElementById("num10").value;
+            var valor = parseFloat(numero);
+            
+            var signo = valor < 0 ? "1" : "0";
+            valor = Math.abs(valor);
+            
+            var exponente = Math.floor(Math.log2(valor));
+            var mantisa = valor / Math.pow(2, exponente) - 1;
+            
+            exponente = exponente + 127;
+            
+            var exponenteBinario = exponente.toString(2);
+            while (exponenteBinario.length < 8) {
+                exponenteBinario = "0" + exponenteBinario;
+            }
+            
+            var mantisaBinaria = "";
+            for (var i = 0; i < 23; i++) {
+                mantisa = mantisa * 2;
+                if (mantisa >= 1) {
+                    mantisaBinaria += "1";
+                    mantisa -= 1;
+                } else {
+                    mantisaBinaria += "0";
+                }
+            }
+            
+            var ieee754 = signo + exponenteBinario + mantisaBinaria;
+            
+            document.getElementById("resultado").innerHTML = 
+                "<h2>Resultado:</h2>" +
+                "<p>Signo: " + signo + "</p>" +
+                "<p>Exponente: " + exponenteBinario + "</p>" +
+                "<p>Mantisa: " + mantisaBinaria + "</p>" +
+                "<p>IEEE 754: " + ieee754 + "</p>";
+        }
+    </script>
+</body>
+</html>
