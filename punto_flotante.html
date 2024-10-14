@@ -18,7 +18,7 @@
             let valor = document.getElementById("num10").value;
             valor = parseFloat(valor);
 
-            let signo = valor < 0 ? 1 : 0;
+            let sig = valor < 0 ? 1 : 0;
             let absValor = Math.abs(valor);
             let exponenteBin = 127;
             let exponente, mantissa;
@@ -37,7 +37,7 @@
             let exponenteBinario = exponente.toString(2).padStart(8, '0');
             let mantissaFinal = mantissa.padEnd(23, '0');
 
-            let ieee754 = signo + exponenteBinario + mantissaFinal;
+            let ieee754 = sig + exponenteBinario + mantissaFinal;
 
             let resultadoDiv = document.getElementById("resultado");
             resultadoDiv.innerHTML = "<h2>Resultado:</h2>" + ieee754 ;
