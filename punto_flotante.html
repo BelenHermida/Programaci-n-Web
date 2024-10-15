@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convertidor a IEEE 754</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <h1>Convertidor de Números Reales a IEEE 754</h1>
+    <P>Ingresa un número real:</p>
+    <input type="number" id="num" step="any" required>
+    <button onclick="convertir()">Convertir</button>
+    <div id="resultado"></div>
+    <div id="tablaEntera"></div>
+    <div id="tablaFraccionaria"></div>
+    
+    <script>
+        function convertir() {
+            let valor = document.getElementById("num").value;
+            valor = parseFloat(valor);
+            let signo = valor < 0 ? 1 : 0;
+            let absValor = Math.abs(valor);
+            let exponenteBase = 127;
+            let exponente, mantissa;
+
+            if (absValor === 0) {
+                exponente = 0;
+                mantissa = '00000000000000000000000';
+            } else {
+                // Parte entera
+                let parteEntera = Math.floor(absValor);
+                let tablaEntera = TabEntera(parteEntera);
+                
+                // Parte fraccionaria
+                let parteFraccionaria = absValor - parteEntera;
+                let tablaFraccionaria = TabFraccionaria(parteFraccionaria);
+                
+                // Calcular exponente y mantissa
+                let logaritmo = Math.floor(Math.log2(absValor));
+                exponente = logaritmo + exponenteBase;
+                let normalizado = absValor / Math.pow(2, logaritmo);
+                mantissa = (normalizado - 1).toString(2).substring(2, 25);
+                
+                // Mostrar tablas
+                document.getElementById("tablaEntera").innerHTML = tablaEntera;
+                document.getElementById("tablaFraccionaria").innerHTML = tablaFraccionaria;
+            }
+
+            let expBin = exponente.toString(2).padStart(8, '0');
+            let mantissaFinal = mantissa.padEnd(23, '0');
+            let ieee754 = signo + expBin + mantissaFinal;
+            let resultadoDiv = document.getElementById("resultado");
+            resultadoDiv.innerHTML = "<h2>Resultado:</h2>" + ieee754;
+        }
+
+        function TabEntera(numero) {
+            let html = `
+                <h3>Parte Entera</h3>
+                <div class="col col-md-12 col-lg-3">
+                    <table class="table table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th>Valor</th>
+                                <th>Divisor</th>
+                                <th>Cociente</th>
+                                <th>Residuo</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+            let valor = numero;
+
+            while (valor > 0) {
+                let residuo = valor % 2;
+                html += `
+                    <tr>
+                        <td>${valor}</td>
+                        <td>2</td>
+                        <td>${Math.floor(valor / 2)}</td>
+                        <td>${residuo}</td>
+                    </tr>`;
+                valor = Math.floor(valor / 2);
+            }
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>`;
+            return html;
+        }
+
+        function TabFraccionaria(numero) {
+            let html = `
+                <h3>Parte Fraccionaria</h3>
+                <div class="col col-md-12 col-lg-3">
+                    <table class="table table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th>Valor</th>
+                                <th>Multiplicador</th>
+                                <th>Producto</th>
+                                <th>Dígito</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+            let valor = numero;
+            let iteraciones = 0;
+
+            while (valor > 0 && iteraciones < 23) {
+                valor *= 2;
+                let digito = Math.floor(valor);
+                html += `
+                    <tr>
+                        <td>${valor.toFixed(6)}</td>
+                        <td>2</td>
+                        <td>${(valor * 2).toFixed(6)}</td>
+                        <td>${digito}</td>
+                    </tr>`;
+                valor -= digito;
+                iteraciones++;
+            }
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>`;
+            return html;
+        }
+    </script>
+</body>
+</html>
